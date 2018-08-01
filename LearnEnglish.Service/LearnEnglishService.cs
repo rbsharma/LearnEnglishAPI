@@ -69,11 +69,14 @@ namespace LearnEnglish.Service
         {
             try
             {
+                long wordsInDb = _collection.CountDocuments(new BsonDocument());
                 NewWord newWord = new NewWord()
-                {
-                    Id = _newWord.Id,
+                {   
+                    Id=Convert.ToString((wordsInDb + 1)),
                     Text = _newWord.Text,
-                    Examples = _newWord.Examples
+                    Meaning=_newWord.Meaning,
+                    Examples = _newWord.Examples,
+                    Tips=_newWord.Tips
                 };
                 await _collection.InsertOneAsync(newWord);
                 return newWord;
@@ -89,16 +92,21 @@ namespace LearnEnglish.Service
         {
             try
             {
+                long wordsInDb = _collection.CountDocuments(new BsonDocument());
+                long currentWordId = wordsInDb + 1;
                 List<NewWord> newWordsToInsert = new List<NewWord>();
                 foreach (NewWordPostModel word in _newWords)
                 {
                     NewWord singleWord = new NewWord()
                     {
-                        Id = word.Id,
+                        Id = Convert.ToString((currentWordId)),
                         Text = word.Text,
-                        Examples = word.Examples
+                        Meaning = word.Meaning,
+                        Examples = word.Examples,
+                        Tips = word.Tips
                     };
                     newWordsToInsert.Add(singleWord);
+                    currentWordId++;
                 }
                 
                 await _collection.InsertManyAsync(newWordsToInsert);
@@ -121,13 +129,27 @@ namespace LearnEnglish.Service
                     {
                         Id = "1",
                         Text = "Initial",
-                        Examples = new string[] { "It is an initial commit", "Initial values are default" }
+                        Meaning="Some Meaning",
+                        Examples = new string[] { "It is an initial commit", "Initial values are default" },
+                        Tips= new string[] { "It is tip 1", "It is tip 2" },
                     };
                     _collection.ReplaceOneAsync(
                         x => x.Id == newWord1.Id,
                         newWord1,
                         new UpdateOptions { IsUpsert = true });
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public static void DestroyDatabase()
+        {
+            try
+            {
+                _client.DropDatabase(settings.Database);
             }
             catch (Exception ex)
             {

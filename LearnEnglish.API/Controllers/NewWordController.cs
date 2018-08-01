@@ -23,6 +23,22 @@ namespace LearnEnglish.API.Controllers
         }
 
         [HttpGet]
+        [Route("destroy")]
+        public HttpResponseMessage Destroy()
+        {
+            try
+            {
+                LearnEnglishService.DestroyDatabase();
+                LearnEnglishService.Instance = null;
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
+            }
+        }
+
+        [HttpGet]
         public async Task<IHttpActionResult> Get()
         {
             var words = await _learnEnglishService.GetAllWords();
