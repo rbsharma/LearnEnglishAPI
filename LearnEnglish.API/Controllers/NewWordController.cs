@@ -30,6 +30,7 @@ namespace LearnEnglish.API.Controllers
             {
                 LearnEnglishService.DestroyDatabase();
                 LearnEnglishService.Instance = null;
+                LearnEnglishService.InsatanceCounter = 0;
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
