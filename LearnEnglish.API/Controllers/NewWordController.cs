@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using LearnEnglish.DataModels.Models;
 using LearnEnglish.Service;
+using MongoDB.Bson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -23,6 +24,7 @@ namespace LearnEnglish.API.Controllers
         }
 
         [HttpGet]
+        [NonAction]
         [Route("destroy")]
         public HttpResponseMessage Destroy()
         {
@@ -40,17 +42,44 @@ namespace LearnEnglish.API.Controllers
         }
 
         [HttpGet]
+        [Route("getall")]
         public async Task<IHttpActionResult> Get()
         {
             var words = await _learnEnglishService.GetAllWords();
             return Ok(words);
         }
 
+        [HttpGet]
+        [Route("dailyupdate")]
+        public async Task<IHttpActionResult> GetDailyUpdate(string lastReceivedItemId = null, string lastReceivedTime = null)
+        {
+            if (String.IsNullOrEmpty(lastReceivedTime))
+            {
+                var words = await _learnEnglishService.GetDailyUpdate();
+                return Ok(words);
+            }
+
+            //string lastReceivedTime = "2018-08-02T01:29:43.138Z";
+            DateTime previousTime = DateTime.Parse(lastReceivedTime, System.Globalization.CultureInfo.InvariantCulture);
+            DateTime currentTime = DateTime.Now;
+            var timeDifference = (currentTime - previousTime).TotalSeconds;
+
+            if (timeDifference > 86400)
+            {
+                var words = await _learnEnglishService.GetDailyUpdate(lastReceivedItemId);
+                return Ok(words);
+            }
+            else
+            {
+                return Ok("Today's updates already sent");
+            }
+        }
+
         [HttpPost]
         [Route("create")]
         public async Task<IHttpActionResult> Create(NewWordPostModel newWord)
-        {            
-            NewWord insertedWord= await _learnEnglishService.CreateNewWord(newWord);
+        {
+            NewWord insertedWord = await _learnEnglishService.CreateNewWord(newWord);
             return Ok(insertedWord);
         }
 

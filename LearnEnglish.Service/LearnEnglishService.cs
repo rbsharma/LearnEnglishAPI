@@ -9,6 +9,7 @@ using MongoDB.Bson;
 using System.Configuration;
 using LearnEnglish.Service.Models;
 using System.Diagnostics;
+using MongoDB.Driver.Linq;
 
 namespace LearnEnglish.Service
 {
@@ -35,6 +36,7 @@ namespace LearnEnglish.Service
             {
                 settings.ConnectionString = Convert.ToString(ConfigurationManager.AppSettings["MongoConnectionString"]);
                 settings.Database = Convert.ToString(ConfigurationManager.AppSettings["Database"]);
+                settings.DailyUpdateWordCount = Convert.ToString(ConfigurationManager.AppSettings["DailyUpdateWordCount"]);
 
                 _client = new MongoClient(settings.ConnectionString);
                 _database = _client.GetDatabase(settings.Database);
@@ -49,6 +51,53 @@ namespace LearnEnglish.Service
 
         }
 
+        private static void InitialSetup()
+        {
+            try
+            {
+                long documentCount = _collection.CountDocuments(new BsonDocument());
+                if (documentCount <= 0)
+                {
+                    NewWord newWord1 = new NewWord
+                    {
+                        Id = "1",
+                        Text = "Start",
+                        Meaning = "The beginning of anything.",
+                        Examples = new string[] { "Never too late for a fresh start.", "Every day is a beginning. Take a deep breath and start again." },
+                        Tips = new string[] { "Derived from old english : styrtan" },
+                    };
+                    _collection.ReplaceOneAsync(
+                        x => x.Id == newWord1.Id,
+                        newWord1,
+                        new UpdateOptions { IsUpsert = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public static void DestroyDatabase()
+        {
+            try
+            {
+                _client.DropDatabase(settings.Database);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Get ObjectId;
+        public ObjectId GetObjectId(string id)
+        {
+            if (!ObjectId.TryParse(id, out ObjectId internalId))
+                internalId = ObjectId.Empty;
+            return internalId;
+        }
+
         public async Task<IEnumerable<NewWord>> GetAllWords()
         {
             try
@@ -56,7 +105,6 @@ namespace LearnEnglish.Service
                 var filter = new BsonDocument();
                 var result = await _collection.Find(filter).ToListAsync();
                 return result;
-
             }
             catch (Exception ex)
             {
@@ -65,18 +113,46 @@ namespace LearnEnglish.Service
 
         }
 
+        public async Task<IEnumerable<NewWord>> GetDailyUpdate(string _lastSentDocumentId = "")
+        {
+            try
+            {
+                int collectionReturnSize = int.Parse(settings.DailyUpdateWordCount);
+                if (String.IsNullOrEmpty(_lastSentDocumentId))
+                {
+                    //send first two;
+                    var result = _collection.AsQueryable<NewWord>().Take(2);
+                    return result;
+                }
+                else
+                {
+                    //send two after last id sent;
+                    ObjectId lastSentDocumentId = GetObjectId(_lastSentDocumentId);
+                    var result = await _collection.AsQueryable<NewWord>()
+                        .Where(c => c.InternalId > lastSentDocumentId)
+                        .Take(2)
+                        .ToListAsync();
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<NewWord> CreateNewWord(NewWordPostModel _newWord)
         {
             try
             {
                 long wordsInDb = _collection.CountDocuments(new BsonDocument());
                 NewWord newWord = new NewWord()
-                {   
-                    Id=Convert.ToString((wordsInDb + 1)),
+                {
+                    Id = Convert.ToString((wordsInDb + 1)),
                     Text = _newWord.Text,
-                    Meaning=_newWord.Meaning,
+                    Meaning = _newWord.Meaning,
                     Examples = _newWord.Examples,
-                    Tips=_newWord.Tips
+                    Tips = _newWord.Tips
                 };
                 await _collection.InsertOneAsync(newWord);
                 return newWord;
@@ -108,7 +184,7 @@ namespace LearnEnglish.Service
                     newWordsToInsert.Add(singleWord);
                     currentWordId++;
                 }
-                
+
                 await _collection.InsertManyAsync(newWordsToInsert);
                 return newWordsToInsert;
             }
@@ -118,43 +194,6 @@ namespace LearnEnglish.Service
             }
 
         }
-        private static void InitialSetup()
-        {
-            try
-            {
-                long documentCount = _collection.CountDocuments(new BsonDocument());
-                if (documentCount <= 0)
-                {
-                    NewWord newWord1 = new NewWord
-                    {
-                        Id = "1",
-                        Text = "Initial",
-                        Meaning="Some Meaning",
-                        Examples = new string[] { "It is an initial commit", "Initial values are default" },
-                        Tips= new string[] { "It is tip 1", "It is tip 2" },
-                    };
-                    _collection.ReplaceOneAsync(
-                        x => x.Id == newWord1.Id,
-                        newWord1,
-                        new UpdateOptions { IsUpsert = true });
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
 
-        public static void DestroyDatabase()
-        {
-            try
-            {
-                _client.DropDatabase(settings.Database);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
     }
 }

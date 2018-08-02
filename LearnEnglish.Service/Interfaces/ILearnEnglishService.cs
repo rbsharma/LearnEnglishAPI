@@ -8,12 +8,32 @@ namespace LearnEnglish.Service.Interfaces
 {
     public interface ILearnEnglishService
     {
+        /// <summary>
+        /// Get All Words from database;
+        /// </summary>
+        /// <returns></returns>
         Task<IEnumerable<NewWord>> GetAllWords();
 
-        //Task<NewWord> GetWord(string id);
+        /// <summary>
+        /// add a single new word document
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
+        Task<NewWord> CreateNewWord(NewWordPostModel word);
 
-        //// add new word document
-        //Task AddWord(NewWord word);
+        /// <summary>
+        /// add multiple new word documents
+        /// </summary>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NewWord>> CreateNewWords(List<NewWordPostModel> words);
+
+        /// <summary>
+        /// Get new word suggestions after 24 hours;
+        /// </summary>
+        /// <param name="lastid"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NewWord>> GetDailyUpdate(string lastid);
 
         //// remove a single document / word
         //Task<bool> RemoveWord(string id);
