@@ -65,6 +65,117 @@ namespace LearnEnglish.Service
                         Meaning = "The beginning of anything.",
                         Examples = new string[] { "Never too late for a fresh start.", "Every day is a beginning. Take a deep breath and start again." },
                         Tips = new string[] { "Derived from old english : styrtan" },
+                        Questions = new Question[]
+                        {
+                            new Question()
+                            {
+                                Id =1,
+                                Text ="Fill in the blank. Never too late for a fresh ______.",
+                                Key =2,
+                                Options = new AnswerChoice[]
+                                {
+                                    new AnswerChoice()
+                                    {
+                                        Id=1,Text="Coffee"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=2,Text="Start"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=3,Text="End"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=4,Text="Sleep"
+                                    }
+                                }
+                            },new Question()
+                            {
+                                Id =2,
+                                Text ="What is the synonym of Start?",
+                                Key =4,
+                                Options = new AnswerChoice[]
+                                {
+                                    new AnswerChoice()
+                                    {
+                                        Id=1,Text="Finish"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=2,Text="Complete"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=3,Text="Begin"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=4,Text="End"
+                                    }
+                                }
+                            },new Question()
+                            {
+                                Id =3,
+                                Text ="An antonym of start is ",
+                                Key =3,
+                                Options = new AnswerChoice[]
+                                {
+                                    new AnswerChoice()
+                                    {
+                                        Id=1,Text="Begin"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=2,Text="Origin"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=3,Text="Stop"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=4,Text="Kick-Start"
+                                    }
+                                }
+                            },
+                            new Question()
+                            {
+                                Id =4,
+                                Text ="Fill in the blank. In order to learn a new language, one has to ______ conversing in it.",
+                                Key =2,
+                                Options = new AnswerChoice[]
+                                {
+                                    new AnswerChoice()
+                                    {
+                                        Id=1,Text="Prey"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=2,Text="Start"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=3,Text="Stop"
+                                    },new AnswerChoice()
+                                    {
+                                        Id=4,Text="Teach"
+                                    }
+                                }
+                            },
+                            new Question()
+                            {
+                                Id =5,
+                                Text ="Which of the choices can refer to starting a new activity?",
+                                Key =2,
+                                Options = new AnswerChoice[]
+                                {
+                                    new AnswerChoice()
+                                    {
+                                        Id=1,Text="Shanky has completed his homework."
+                                    },new AnswerChoice()
+                                    {
+                                        Id=2,Text="Ruby is going to meet his boss today."
+                                    },new AnswerChoice()
+                                    {
+                                        Id=3,Text="I just watched a movie."
+                                    },new AnswerChoice()
+                                    {
+                                        Id=4,Text="Eating that pie was a delicious task!!"
+                                    }
+                                }
+                            }
+                        }
                     };
                     _collection.ReplaceOneAsync(
                         x => x.Id == newWord1.Id,
