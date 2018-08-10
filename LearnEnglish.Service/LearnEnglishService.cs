@@ -263,7 +263,8 @@ namespace LearnEnglish.Service
                     Text = _newWord.Text,
                     Meaning = _newWord.Meaning,
                     Examples = _newWord.Examples,
-                    Tips = _newWord.Tips
+                    Tips = _newWord.Tips,
+                    Questions = _newWord.Questions
                 };
                 await _collection.InsertOneAsync(newWord);
                 return newWord;
@@ -290,7 +291,8 @@ namespace LearnEnglish.Service
                         Text = word.Text,
                         Meaning = word.Meaning,
                         Examples = word.Examples,
-                        Tips = word.Tips
+                        Tips = word.Tips,
+                        Questions = word.Questions
                     };
                     newWordsToInsert.Add(singleWord);
                     currentWordId++;
