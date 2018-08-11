@@ -30,7 +30,8 @@ namespace LearnEnglish.DataModels.Models
     public class Question
     {
         public int Id { get; set; }
-        public AnswerChoice[] Options { get; set; }
+        //public AnswerChoice[] Options { get; set; }
+        public string[] Options { get; set; }
         public string Text { get; set; }
         public int Key { get; set; }
 
