@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -64,7 +65,9 @@ namespace LearnEnglish.API.Controllers
             DateTime currentTime = DateTime.Now;
             var timeDifference = (currentTime - previousTime).TotalSeconds;
 
-            if (timeDifference > 86400)
+            var timeRequiredForUpdate = int.Parse(ConfigurationManager.AppSettings["UpdateTimeInSeconds"]);
+
+            if (timeDifference > timeRequiredForUpdate)
             {
                 var words = await _learnEnglishService.GetDailyUpdate(lastReceivedItemId);
                 return Ok(words);
