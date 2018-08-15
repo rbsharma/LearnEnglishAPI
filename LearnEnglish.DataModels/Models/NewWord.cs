@@ -10,7 +10,7 @@ namespace LearnEnglish.DataModels.Models
     {
         [BsonId]
         public ObjectId InternalId { get; set; }
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Text { get; set; }
         public string Meaning { get; set; }
         public string[] Examples { get; set; }

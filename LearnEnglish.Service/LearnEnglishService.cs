@@ -42,7 +42,7 @@ namespace LearnEnglish.Service
                 _database = _client.GetDatabase(settings.Database);
                 _collection = _database.GetCollection<NewWord>("NewWords");
 
-                InitialSetup();
+                //InitialSetup();
             }
             catch (Exception ex)
             {
@@ -60,7 +60,7 @@ namespace LearnEnglish.Service
                 {
                     NewWord newWord1 = new NewWord
                     {
-                        Id = "1",
+                        Id = 1,
                         Text = "Start",
                         Meaning = "The beginning of anything.",
                         Examples = new string[] { "Never too late for a fresh start.", "Every day is a beginning. Take a deep breath and start again." },
@@ -176,10 +176,12 @@ namespace LearnEnglish.Service
                 }
                 else
                 {
+                    //ObjectId abc = GetObjectId(_lastSentDocumentId);
                     //send two after last id sent;
-                    ObjectId lastSentDocumentId = GetObjectId(_lastSentDocumentId);
+                    //ObjectId lastSentDocumentId = GetObjectId(_lastSentDocumentId);
+                    var id = Convert.ToInt32(_lastSentDocumentId);
                     var result = await _collection.AsQueryable<NewWord>()
-                        .Where(c => c.InternalId > lastSentDocumentId)
+                        .Where(c => c.Id > id)
                         .Take(2)
                         .ToListAsync();
                     return result;
@@ -198,7 +200,7 @@ namespace LearnEnglish.Service
                 long wordsInDb = _collection.CountDocuments(new BsonDocument());
                 NewWord newWord = new NewWord()
                 {
-                    Id = Convert.ToString((wordsInDb + 1)),
+                    Id = Convert.ToInt32(wordsInDb) + 1,
                     Text = _newWord.Text,
                     Meaning = _newWord.Meaning,
                     Examples = _newWord.Examples,
@@ -226,7 +228,7 @@ namespace LearnEnglish.Service
                 {
                     NewWord singleWord = new NewWord()
                     {
-                        Id = Convert.ToString((currentWordId)),
+                        Id = Convert.ToInt32((currentWordId)),
                         Text = word.Text,
                         Meaning = word.Meaning,
                         Examples = word.Examples,
