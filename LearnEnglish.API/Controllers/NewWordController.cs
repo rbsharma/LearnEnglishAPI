@@ -93,5 +93,21 @@ namespace LearnEnglish.API.Controllers
             IEnumerable<NewWord> insertedWords = await _learnEnglishService.CreateNewWords(newWordList);
             return Ok(insertedWords);
         }
+
+        [HttpPost]
+        [Route("stats")]
+        public async Task<IHttpActionResult> GetStats(StatsPostModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var stats = await _learnEnglishService.GetStats(model);
+                return Ok(stats);
+            }
+            else
+            {
+                return Ok("Today's updates already sent");
+            }
+        }
     }
 }
+

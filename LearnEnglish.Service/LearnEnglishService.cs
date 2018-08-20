@@ -114,7 +114,8 @@ namespace LearnEnglish.Service
                                     "Eating that pie was a delicious task!!"
                                 }
                             }
-                        }
+                        },
+                        Stats = new Stats { HitCount = 0 }
                     };
                     _collection.ReplaceOneAsync(
                         x => x.Id == newWord1.Id,
@@ -168,10 +169,12 @@ namespace LearnEnglish.Service
             try
             {
                 int collectionReturnSize = int.Parse(settings.DailyUpdateWordCount);
+
                 if (String.IsNullOrEmpty(_lastSentDocumentId))
                 {
                     //send first two;
                     var result = _collection.AsQueryable<NewWord>().Take(2);
+                    this.UpdateStats(result.ToList());
                     return result;
                 }
                 else
@@ -184,6 +187,7 @@ namespace LearnEnglish.Service
                         .Where(c => c.Id > id)
                         .Take(2)
                         .ToListAsync();
+                    this.UpdateStats(result);
                     return result;
                 }
             }
@@ -205,7 +209,8 @@ namespace LearnEnglish.Service
                     Meaning = _newWord.Meaning,
                     Examples = _newWord.Examples,
                     Tips = _newWord.Tips,
-                    Questions = _newWord.Questions
+                    Questions = _newWord.Questions,
+                    Stats = new Stats { HitCount = 0 }
                 };
                 await _collection.InsertOneAsync(newWord);
                 return newWord;
@@ -233,7 +238,8 @@ namespace LearnEnglish.Service
                         Meaning = word.Meaning,
                         Examples = word.Examples,
                         Tips = word.Tips,
-                        Questions = word.Questions
+                        Questions = word.Questions,
+                        Stats = new Stats { HitCount = 0 }
                     };
                     newWordsToInsert.Add(singleWord);
                     currentWordId++;
@@ -249,5 +255,60 @@ namespace LearnEnglish.Service
 
         }
 
+        public bool UpdateStats(List<NewWord> words)
+        {
+            try
+            {
+                bool UpdatesSuccessful = false;
+                foreach (var word in words)
+                {
+                    word.Stats.HitCount++;
+                    var item = _collection.ReplaceOne(x => x.Id == word.Id, word, new UpdateOptions { IsUpsert = true });
+                    UpdatesSuccessful = true;
+                }
+
+                return UpdatesSuccessful;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<IEnumerable<StatsResult>> GetStats(StatsPostModel model)
+        {
+            try
+            {
+                var allWords = new List<NewWord>();
+                if (model.Id > 0)
+                {
+                    allWords = await _collection.AsQueryable<NewWord>().Where(x => x.Id == model.Id).ToListAsync();
+                }
+                if (allWords.Count <= 0 && !string.IsNullOrEmpty(model.Text))
+                {
+                    allWords = await _collection.AsQueryable<NewWord>().Where(x => x.Text == model.Text).ToListAsync();
+                }
+                if (allWords.Count <= 0)
+                {
+                    allWords = await _collection.Find(new BsonDocument()).ToListAsync();
+                }
+                //var allWords = await _collection.Find(filter).ToListAsync();
+                IList<StatsResult> statsResult = new List<StatsResult>();
+                foreach (var item in allWords)
+                {
+                    statsResult.Add(new StatsResult
+                    {
+                        WordId = item.Id,
+                        Text = item.Text,
+                        HitCount = item.Stats.HitCount
+                    });
+                }
+                return statsResult;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

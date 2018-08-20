@@ -16,6 +16,7 @@ namespace LearnEnglish.DataModels.Models
         public string[] Examples { get; set; }
         public string[] Tips { get; set; }
         public Question[] Questions { get; set; }
+        public Stats Stats { get; set; }
     }
 
     public class NewWordPostModel
@@ -47,4 +48,21 @@ namespace LearnEnglish.DataModels.Models
         //public bool IsCorrect { get; set; }
     }
 
+    public class Stats
+    {
+        public int HitCount { get; set; }
+    }
+
+    public class StatsResult
+    {
+        public int WordId { get; set; }
+        public string Text { get; set; }
+        public int HitCount { get; set; }
+    }
+
+    public class StatsPostModel
+    {
+        public int? Id { get; set; }
+        public string Text { get; set; }
+    }
 }
