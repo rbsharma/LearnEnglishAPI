@@ -280,11 +280,11 @@ namespace LearnEnglish.Service
             try
             {
                 var allWords = new List<NewWord>();
-                if (model.Id > 0)
+                if (model != null && model.Id > 0)
                 {
                     allWords = await _collection.AsQueryable<NewWord>().Where(x => x.Id == model.Id).ToListAsync();
                 }
-                if (allWords.Count <= 0 && !string.IsNullOrEmpty(model.Text))
+                if (allWords.Count <= 0 && model != null && !string.IsNullOrEmpty(model.Text))
                 {
                     allWords = await _collection.AsQueryable<NewWord>().Where(x => x.Text == model.Text).ToListAsync();
                 }
