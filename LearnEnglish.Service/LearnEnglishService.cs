@@ -18,6 +18,7 @@ namespace LearnEnglish.Service
         protected static IMongoClient _client;
         protected static IMongoDatabase _database;
         protected static IMongoCollection<NewWord> _collection;
+        protected static IMongoCollection<LoggingData> _Logcollection;
         protected static Settings settings = new Settings();
         public static LearnEnglishService Instance = null;
         public static int InsatanceCounter = 0;
@@ -41,6 +42,7 @@ namespace LearnEnglish.Service
                 _client = new MongoClient(settings.ConnectionString);
                 _database = _client.GetDatabase(settings.Database);
                 _collection = _database.GetCollection<NewWord>("NewWords");
+                _Logcollection = _database.GetCollection<LoggingData>("Logs");
 
                 //InitialSetup();
             }
@@ -304,6 +306,51 @@ namespace LearnEnglish.Service
                     });
                 }
                 return statsResult;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<LoggingData> InsertLog(LoggingData newLog)
+        {
+            try
+            {
+                await _Logcollection.InsertOneAsync(newLog);
+                return newLog;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<IEnumerable<LoggingData>> GetAllLogs()
+        {
+            try
+            {
+                var filter = new BsonDocument();
+                var result = await _Logcollection.Find(filter).ToListAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        public async Task<bool> ClearLogs()
+        {
+            try
+            {
+                await _database.DropCollectionAsync("Logs");
+                _Logcollection = _database.GetCollection<LoggingData>("Logs");
+                LoggingData newLog = new LoggingData(DateTime.Now, String.Empty, string.Empty, "NewWord", "ClearLogs");
+                var loggedData = InsertLog(newLog);
+
+                return true;
             }
             catch (Exception ex)
             {

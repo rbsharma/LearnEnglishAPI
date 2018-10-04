@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using LearnEnglish.API.CustomFilters;
 using LearnEnglish.DataModels.Models;
 using LearnEnglish.Service;
 using MongoDB.Bson;
@@ -19,6 +20,7 @@ namespace LearnEnglish.API.Controllers
     /// Controller for word section. 
     /// </summary>
     [RoutePrefix("api/newword")]
+    [CustomActionFilter]
     public class NewWordController : ApiController
     {
         private LearnEnglishService _learnEnglishService;
@@ -147,6 +149,22 @@ namespace LearnEnglish.API.Controllers
             {
                 return Ok("Today's updates already sent");
             }
+        }
+
+        [AcceptVerbs("Get")]
+        [Route("logs")]
+        public async Task<IHttpActionResult> GetLogs()
+        {
+            var logs = await _learnEnglishService.GetAllLogs();
+            return Ok(logs.OrderByDescending(x => x._id));
+        }
+
+        [HttpGet]
+        [Route("clear-logs")]
+        public async Task<IHttpActionResult> ClearLogs()
+        {
+            var droppedCollection = await _learnEnglishService.ClearLogs();
+            return Ok(droppedCollection);
         }
     }
 }

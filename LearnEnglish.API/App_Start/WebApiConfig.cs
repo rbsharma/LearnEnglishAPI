@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using LearnEnglish.API.CustomFilters;
 
 namespace LearnEnglish.API
 {
@@ -14,6 +15,8 @@ namespace LearnEnglish.API
                 .Add(new System.Net.Http.Headers.MediaTypeHeaderValue("text/html"));
             // Web API routes
             config.MapHttpAttributeRoutes();
+
+            config.Filters.Add(new CustomActionFilter());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
